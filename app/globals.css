@@ -149,13 +149,14 @@ input, select, textarea {
   }
 }
 
-/* Client portal gradient background - subtle 85% navy, 5% gray, 5% neon yellow, 5% light blue */
+/* Client portal gradient background - vibrant gradient from navy to blue to cyan to electric lime */
 @layer utilities {
   .bg-client-portal {
     background:
-      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(107, 114, 128, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse 70% 50% at 85% 20%, rgba(235, 255, 130, 0.06) 0%, transparent 45%),
-      radial-gradient(ellipse 60% 40% at 70% 90%, rgba(147, 197, 253, 0.05) 0%, transparent 40%),
-      linear-gradient(180deg, #1C1C60 0%, #1C1C60 100%);
+      radial-gradient(ellipse 100% 80% at 95% 10%, #EBFF82 0%, rgba(235, 255, 130, 0.6) 20%, transparent 50%),
+      radial-gradient(ellipse 90% 70% at 85% 25%, rgba(64, 224, 208, 0.7) 0%, rgba(0, 206, 209, 0.5) 25%, transparent 55%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, rgba(65, 105, 225, 0.6) 0%, rgba(28, 28, 96, 0.8) 40%, transparent 70%),
+      radial-gradient(ellipse 80% 80% at 10% 90%, rgba(0, 0, 0, 0.8) 0%, rgba(28, 28, 96, 0.9) 30%, transparent 60%),
+      linear-gradient(135deg, #000000 0%, #1C1C60 30%, #2E4A9E 60%, #3BA5C9 85%, #EBFF82 100%);
   }
 }
