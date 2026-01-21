@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Plus, Trash2, GripVertical } from 'lucide-react'
+import CSVQuestionImport from '@/components/admin/CSVQuestionImport'
+import { CreateQuestionInput } from '@/types'
 
 interface Question {
   question_text: string
@@ -41,6 +43,10 @@ export default function NewQuestionnairePage() {
     const updated = [...questions]
     updated[index] = { ...updated[index], [field]: value }
     setQuestions(updated)
+  }
+
+  const handleImportQuestions = (importedQuestions: CreateQuestionInput[]) => {
+    setQuestions([...questions, ...importedQuestions])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,6 +119,9 @@ export default function NewQuestionnairePage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* CSV Import */}
+          <CSVQuestionImport onImport={handleImportQuestions} />
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
