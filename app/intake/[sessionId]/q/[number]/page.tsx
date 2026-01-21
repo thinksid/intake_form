@@ -43,13 +43,20 @@ export default async function QuestionPage({
     r => r.question_id === question.id
   )
 
+  // Serialize dates for client component
+  const serializedResponse = existingResponse ? {
+    ...existingResponse,
+    created_at: existingResponse.created_at?.toISOString() || null,
+    updated_at: existingResponse.updated_at?.toISOString() || null,
+  } : undefined
+
   return (
     <QuestionView
       sessionId={params.sessionId}
       question={question}
       questionNumber={questionNumber}
       totalQuestions={questionnaire.questions.length}
-      existingResponse={existingResponse}
+      existingResponse={serializedResponse}
     />
   )
 }

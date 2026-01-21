@@ -9,9 +9,9 @@ export interface Questionnaire {
   title: string
   client_name: string
   status: QuestionnaireStatus
-  created_at: Date | null
-  updated_at: Date | null
-  completed_at: Date | null
+  created_at: Date | string | null
+  updated_at: Date | string | null
+  completed_at: Date | string | null
   questions?: Question[]
   responses?: Response[]
 }
@@ -23,7 +23,7 @@ export interface Question {
   question_type: QuestionType
   is_required: boolean
   display_order: number
-  created_at: Date | null
+  created_at: Date | string | null
 }
 
 export interface Response {
@@ -33,8 +33,8 @@ export interface Response {
   response_text: string | null
   file_url: string | null
   file_urls: string | null  // JSON string of array
-  created_at: Date | null
-  updated_at: Date | null
+  created_at: Date | string | null
+  updated_at: Date | string | null
   question?: Question
 }
 
