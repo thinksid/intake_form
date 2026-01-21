@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Loader2,
 } from 'lucide-react'
+import { parseFileUrls, getFileDisplayName } from '@/lib/utils'
 
 interface Question {
   id: string
@@ -29,6 +30,7 @@ interface Response {
   question_id: string
   response_text: string | null
   file_url: string | null
+  file_urls: string | null  // JSON string
 }
 
 interface Questionnaire {
@@ -155,7 +157,8 @@ export default function ReviewView({ sessionId, questionnaire }: ReviewViewProps
         <div className="space-y-4">
           {questionnaire.questions.map((q, index) => {
             const response = responseMap.get(q.id)
-            const hasResponse = response?.response_text || response?.file_url
+            const fileUrls = parseFileUrls(response)
+            const hasResponse = response?.response_text || fileUrls.length > 0
 
             return (
               <Card
@@ -198,16 +201,23 @@ export default function ReviewView({ sessionId, questionnaire }: ReviewViewProps
                         <div className="text-sm text-thinksid-navy/80 whitespace-pre-wrap bg-thinksid-navy/5 p-4 rounded-xl">
                           {response.response_text}
                         </div>
-                      ) : response?.file_url ? (
-                        <a
-                          href={response.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm text-thinksid-navy font-medium hover:text-thinksid-navy/80 transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Attachment
-                        </a>
+                      ) : fileUrls.length > 0 ? (
+                        <div className="space-y-2">
+                          {fileUrls.map((url, idx) => (
+                            <a
+                              key={idx}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-sm text-thinksid-navy font-medium hover:text-thinksid-navy/80 transition-colors block"
+                            >
+                              <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">
+                                {getFileDisplayName(url, idx + 1)}
+                              </span>
+                            </a>
+                          ))}
+                        </div>
                       ) : (
                         <p className="text-sm text-slate-gray italic">
                           {q.is_required ? 'Required - Please provide an answer' : 'No answer provided'}

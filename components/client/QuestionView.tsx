@@ -25,6 +25,7 @@ interface Response {
   id: string
   response_text: string | null
   file_url: string | null
+  file_urls: string | null  // JSON string
 }
 
 interface QuestionViewProps {
@@ -44,14 +45,29 @@ export default function QuestionView({
 }: QuestionViewProps) {
   const router = useRouter()
   const [answer, setAnswer] = useState(existingResponse?.response_text || '')
-  const [fileUrl, setFileUrl] = useState(existingResponse?.file_url || '')
+  const [fileUrls, setFileUrls] = useState<string[]>(() => {
+    // Try to parse file_urls (new format)
+    if (existingResponse?.file_urls) {
+      try {
+        const parsed = JSON.parse(existingResponse.file_urls)
+        return Array.isArray(parsed) ? parsed : []
+      } catch {
+        return []
+      }
+    }
+    // Fallback to single file_url (legacy format)
+    if (existingResponse?.file_url) {
+      return [existingResponse.file_url]
+    }
+    return []
+  })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Use refs to always have current values in callbacks without causing re-renders
   const answerRef = useRef(answer)
-  const fileUrlRef = useRef(fileUrl)
+  const fileUrlsRef = useRef(fileUrls)
 
   // Keep refs in sync
   useEffect(() => {
@@ -59,22 +75,22 @@ export default function QuestionView({
   }, [answer])
 
   useEffect(() => {
-    fileUrlRef.current = fileUrl
-  }, [fileUrl])
+    fileUrlsRef.current = fileUrls
+  }, [fileUrls])
 
   const progress = (questionNumber / totalQuestions) * 100
   const isLastQuestion = questionNumber === totalQuestions
   const isFileQuestion = question.question_type === 'FILE_UPLOAD'
 
   // Determine if we can proceed
-  const hasAnswer = isFileQuestion ? !!fileUrl : !!answer.trim()
+  const hasAnswer = isFileQuestion ? fileUrls.length > 0 : !!answer.trim()
   const canProceed = !question.is_required || hasAnswer
 
   // Auto-save function - uses refs to get current values
   const saveAnswer = useCallback(async (showIndicator = true) => {
     const currentAnswer = answerRef.current
-    const currentFileUrl = fileUrlRef.current
-    const currentHasAnswer = isFileQuestion ? !!currentFileUrl : !!currentAnswer.trim()
+    const currentFileUrls = fileUrlsRef.current
+    const currentHasAnswer = isFileQuestion ? currentFileUrls.length > 0 : !!currentAnswer.trim()
 
     if (!currentHasAnswer) return
 
@@ -87,7 +103,7 @@ export default function QuestionView({
         body: JSON.stringify({
           question_id: question.id,
           response_text: isFileQuestion ? null : currentAnswer,
-          file_url: isFileQuestion ? currentFileUrl : null,
+          file_urls: isFileQuestion ? currentFileUrls : null,
         }),
       })
 
@@ -108,7 +124,7 @@ export default function QuestionView({
       clearTimeout(autoSaveTimeoutRef.current)
     }
 
-    const currentHasAnswer = isFileQuestion ? !!fileUrl : !!answer.trim()
+    const currentHasAnswer = isFileQuestion ? fileUrls.length > 0 : !!answer.trim()
     if (currentHasAnswer) {
       autoSaveTimeoutRef.current = setTimeout(() => {
         saveAnswer(false)
@@ -120,7 +136,7 @@ export default function QuestionView({
         clearTimeout(autoSaveTimeoutRef.current)
       }
     }
-  }, [answer, fileUrl, isFileQuestion, saveAnswer])
+  }, [answer, fileUrls, isFileQuestion, saveAnswer])
 
   const handleNext = async () => {
     if (hasAnswer) {
@@ -206,8 +222,8 @@ export default function QuestionView({
             {isFileQuestion ? (
               <FileUpload
                 sessionId={sessionId}
-                currentFileUrl={fileUrl}
-                onFileChange={(url) => setFileUrl(url || '')}
+                currentFileUrls={fileUrls}
+                onFileChange={(urls) => setFileUrls(urls || [])}
               />
             ) : (
               <>

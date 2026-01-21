@@ -40,6 +40,7 @@ model responses {
   question_id       String          @db.Uuid
   response_text     String?
   file_url          String?         @db.VarChar
+  file_urls         String?         // JSON array of file URLs
   created_at        DateTime?       @default(now()) @db.Timestamptz(6)
   updated_at        DateTime?       @default(now()) @db.Timestamptz(6)
   questionnaire     questionnaires  @relation(fields: [questionnaire_id], references: [id], onDelete: Cascade)

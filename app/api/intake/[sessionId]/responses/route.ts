@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { successResponse, handleApiError, errorResponse } from '@/lib/api'
+import { parseFileUrls } from '@/lib/utils'
 
 // GET all responses for a questionnaire
 export async function GET(
@@ -28,7 +29,13 @@ export async function GET(
       },
     })
 
-    return successResponse(responses)
+    // Add parsed file URLs for client convenience
+    const responsesWithParsedFiles = responses.map(r => ({
+      ...r,
+      parsedFileUrls: parseFileUrls(r),
+    }))
+
+    return successResponse(responsesWithParsedFiles)
   } catch (error) {
     return handleApiError(error)
   }
@@ -41,10 +48,26 @@ export async function POST(
 ) {
   try {
     const body = await request.json()
-    const { question_id, response_text, file_url } = body
+    const { question_id, response_text, file_url, file_urls } = body
 
     if (!question_id) {
       return errorResponse('question_id is required', 400)
+    }
+
+    // Validate file_urls if provided
+    if (file_urls) {
+      if (!Array.isArray(file_urls)) {
+        return errorResponse('file_urls must be an array', 400)
+      }
+      if (file_urls.length === 0) {
+        return errorResponse('file_urls cannot be empty', 400)
+      }
+      // Validate each URL
+      for (const url of file_urls) {
+        if (typeof url !== 'string' || url.trim() === '') {
+          return errorResponse('Invalid URL in file_urls', 400)
+        }
+      }
     }
 
     const questionnaire = await prisma.questionnaires.findUnique({
@@ -74,7 +97,11 @@ export async function POST(
       })
     }
 
-    // Upsert the response
+    // Prepare data for upsert
+    const fileUrlsJson = file_urls ? JSON.stringify(file_urls) : null
+    const singleFileUrl = file_urls && file_urls.length > 0 ? file_urls[0] : file_url
+
+    // Upsert the response with dual-write
     const response = await prisma.responses.upsert({
       where: {
         questionnaire_id_question_id: {
@@ -86,11 +113,13 @@ export async function POST(
         questionnaire_id: questionnaire.id,
         question_id,
         response_text,
-        file_url,
+        file_url: singleFileUrl,      // BACKWARD COMPAT: Store first file
+        file_urls: fileUrlsJson,       // NEW: Store all files as JSON
       },
       update: {
         response_text,
-        file_url,
+        file_url: singleFileUrl,       // BACKWARD COMPAT
+        file_urls: fileUrlsJson,       // NEW
         updated_at: new Date(),
       },
     })
