@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model questionnaires {
+  id           String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  session_id   String                 @unique @db.VarChar
+  title        String                 @db.VarChar
+  client_name  String                 @db.VarChar
+  status       questionnaire_status   @default(NOT_STARTED)
+  created_at   DateTime?              @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime?              @default(now()) @db.Timestamptz(6)
+  completed_at DateTime?              @db.Timestamptz(6)
+  questions    questions[]
+  responses    responses[]
+}
+
+model questions {
+  id                String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  questionnaire_id  String           @db.Uuid
+  question_text     String
+  question_type     question_type    @default(OPEN_ENDED)
+  is_required       Boolean          @default(true)
+  display_order     Int
+  created_at        DateTime?        @default(now()) @db.Timestamptz(6)
+  questionnaire     questionnaires   @relation(fields: [questionnaire_id], references: [id], onDelete: Cascade)
+  responses         responses[]
+
+  @@index([questionnaire_id])
+}
+
+model responses {
+  id                String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  questionnaire_id  String          @db.Uuid
+  question_id       String          @db.Uuid
+  response_text     String?
+  file_url          String?         @db.VarChar
+  created_at        DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?       @default(now()) @db.Timestamptz(6)
+  questionnaire     questionnaires  @relation(fields: [questionnaire_id], references: [id], onDelete: Cascade)
+  question          questions       @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@unique([questionnaire_id, question_id])
+  @@index([questionnaire_id])
+  @@index([question_id])
+}
+
+enum questionnaire_status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum question_type {
+  OPEN_ENDED
+  SHORT_ANSWER
+  FILE_UPLOAD
+}

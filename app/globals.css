@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ThinkSid Brand Colors converted to HSL for CSS variables */
+    --background: 0 0% 100%;
+    --foreground: 240 55% 24%; /* ThinkSid Navy */
+
+    --card: 0 0% 95%; /* #f3f3f3 */
+    --card-foreground: 240 55% 24%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 55% 24%;
+
+    /* Primary = ThinkSid Navy */
+    --primary: 240 55% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary = Light navy tint */
+    --secondary: 240 30% 96%;
+    --secondary-foreground: 240 55% 24%;
+
+    /* Muted = Slate Gray based */
+    --muted: 215 16% 92%;
+    --muted-foreground: 215 16% 34%; /* Slate Gray */
+
+    /* Accent = Electric Lime */
+    --accent: 72 100% 75%;
+    --accent-foreground: 240 55% 24%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 20% 88%;
+    --input: 215 20% 88%;
+    --ring: 72 100% 75%; /* Electric Lime for focus rings */
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 55% 8%;
+    --foreground: 0 0% 100%;
+
+    --card: 240 55% 12%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 240 55% 12%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 72 100% 75%; /* Electric Lime as primary in dark mode */
+    --primary-foreground: 240 55% 24%;
+
+    --secondary: 240 30% 20%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 30% 18%;
+    --muted-foreground: 215 16% 70%;
+
+    --accent: 240 55% 24%;
+    --accent-foreground: 72 100% 75%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 30% 25%;
+    --input: 240 30% 25%;
+    --ring: 72 100% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  /* Typography defaults using ThinkSid fonts */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-medium;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+}
+
+/* Mobile-first adjustments */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better touch targets for mobile - Revolut inspired large touch areas */
+button, a, [role="button"] {
+  min-height: 44px;
+}
+
+/* Prevent zoom on input focus (iOS) */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Focus styles - Electric Lime outline for accessibility */
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-lime focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+/* Smooth transitions for interactive elements */
+@layer utilities {
+  .transition-smooth {
+    @apply transition-all duration-200 ease-out;
+  }
+}
+
+/* Card hover effect */
+@layer utilities {
+  .card-hover {
+    @apply transition-all duration-200 ease-out hover:shadow-elevated hover:-translate-y-0.5;
+  }
+}
+
+/* Premium button press effect */
+@layer utilities {
+  .btn-press {
+    @apply active:scale-[0.98] transition-transform duration-100;
+  }
+}
+
+/* Client portal gradient background - subtle 85% navy, 5% gray, 5% neon yellow, 5% light blue */
+@layer utilities {
+  .bg-client-portal {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(107, 114, 128, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 70% 50% at 85% 20%, rgba(235, 255, 130, 0.06) 0%, transparent 45%),
+      radial-gradient(ellipse 60% 40% at 70% 90%, rgba(147, 197, 253, 0.05) 0%, transparent 40%),
+      linear-gradient(180deg, #1C1C60 0%, #1C1C60 100%);
+  }
+}
