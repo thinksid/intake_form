@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Download, FileText, ExternalLink } from 'lucide-react'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, parseFileUrls, getFileDisplayName } from '@/lib/utils'
 
 interface Question {
   id: string
@@ -20,6 +20,7 @@ interface Response {
   question_id: string
   response_text: string | null
   file_url: string | null
+  file_urls: string | null  // JSON string
   created_at: string | Date | null
   question: Question
 }
@@ -52,10 +53,16 @@ export default function ResponseViewer({ questionnaire }: { questionnaire: Quest
 
       if (response?.response_text) {
         md += `${response.response_text}\n\n`
-      } else if (response?.file_url) {
-        md += `[File Attachment](${response.file_url})\n\n`
       } else {
-        md += `*No response*\n\n`
+        const fileUrls = parseFileUrls(response)
+        if (fileUrls.length > 0) {
+          fileUrls.forEach((url, idx) => {
+            md += `[${getFileDisplayName(url, idx + 1)}](${url})\n`
+          })
+          md += `\n`
+        } else {
+          md += `*No response*\n\n`
+        }
       }
     })
 
@@ -69,15 +76,16 @@ export default function ResponseViewer({ questionnaire }: { questionnaire: Quest
   }
 
   const exportCSV = () => {
-    const headers = ['Question', 'Type', 'Required', 'Response', 'File URL']
+    const headers = ['Question', 'Type', 'Required', 'Response', 'File URLs']
     const rows = questionnaire.questions.map(q => {
       const response = responseMap.get(q.id)
+      const fileUrls = parseFileUrls(response)
       return [
         `"${q.question_text.replace(/"/g, '""')}"`,
         q.question_type,
         q.is_required ? 'Yes' : 'No',
         `"${(response?.response_text || '').replace(/"/g, '""')}"`,
-        response?.file_url || '',
+        fileUrls.join(' | '),  // Multiple URLs separated by pipe
       ]
     })
 
@@ -153,16 +161,23 @@ export default function ResponseViewer({ questionnaire }: { questionnaire: Quest
                 <CardContent>
                   {response?.response_text ? (
                     <p className="text-gray-900 whitespace-pre-wrap">{response.response_text}</p>
-                  ) : response?.file_url ? (
-                    <a
-                      href={response.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-primary hover:underline"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View Attachment
-                    </a>
+                  ) : parseFileUrls(response).length > 0 ? (
+                    <div className="space-y-1">
+                      {parseFileUrls(response).map((url, idx) => (
+                        <a
+                          key={idx}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-primary hover:underline block text-sm"
+                        >
+                          <ExternalLink className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">
+                            {getFileDisplayName(url, idx + 1)}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
                   ) : (
                     <p className="text-gray-400 italic">No response provided</p>
                   )}

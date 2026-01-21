@@ -32,6 +32,7 @@ export interface Response {
   question_id: string
   response_text: string | null
   file_url: string | null
+  file_urls: string | null  // JSON string of array
   created_at: Date | null
   updated_at: Date | null
   question?: Question
@@ -53,6 +54,7 @@ export interface SaveResponseInput {
   question_id: string
   response_text?: string
   file_url?: string
+  file_urls?: string[]  // Array of file URLs
 }
 
 export interface ApiResponse<T> {
@@ -61,4 +63,10 @@ export interface ApiResponse<T> {
     message: string
     code?: string
   }
+}
+
+export interface FileAttachment {
+  name: string
+  url: string
+  uploading?: boolean
 }
