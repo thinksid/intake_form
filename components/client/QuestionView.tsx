@@ -175,10 +175,10 @@ export default function QuestionView({
         {/* Progress */}
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="font-medium text-thinksid-navy">
+            <span className="font-medium text-white">
               Question {questionNumber}
             </span>
-            <span className="text-slate-gray">
+            <span className="text-white font-medium">
               {Math.round(progress)}% complete
             </span>
           </div>
