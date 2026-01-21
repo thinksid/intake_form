@@ -31,7 +31,8 @@ export default async function WelcomePage({
 
   const questionCount = questionnaire.questions.length
   const answeredCount = questionnaire.responses.length
-  const estimatedMinutes = Math.ceil(questionCount * 2)
+  const estimatedMinutesMin = questionCount
+  const estimatedMinutesMax = Math.floor(questionCount * 1.5)
 
   // If there are existing responses, calculate which question to resume from
   const answeredQuestionIds = new Set(questionnaire.responses.map(r => r.question_id))
@@ -63,26 +64,23 @@ export default async function WelcomePage({
             />
           </div>
           <CardTitle className="text-2xl md:text-3xl font-bold font-heading text-thinksid-navy">
-            {isResuming ? 'Welcome Back!' : 'Welcome!'}
+            Welcome, {questionnaire.client_name}.
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* Questionnaire Info */}
-          <div className="text-center space-y-2">
-            <p className="text-xl font-semibold font-heading text-thinksid-navy">
-              {questionnaire.title}
+          <div className="text-center space-y-3">
+            <p className="text-lg text-slate-gray">
+              This is your <span className="font-semibold text-thinksid-navy">{questionnaire.title}</span> questionnaire.
             </p>
-            <p className="text-slate-gray">
-              For: <span className="font-medium text-thinksid-navy">{questionnaire.client_name}</span>
+            <p className="text-slate-gray leading-relaxed">
+              By completing this, you are helping us deeply understand your business ahead of our consultation process.
             </p>
           </div>
 
           {/* Description Card */}
           <div className="bg-thinksid-navy/5 rounded-2xl p-5 space-y-4">
-            <p className="text-slate-gray leading-relaxed">
-              This questionnaire helps us understand your business better before our consultation.
-            </p>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-3">
@@ -93,7 +91,7 @@ export default async function WelcomePage({
               </div>
               <div className="bg-white rounded-xl p-3 text-center shadow-soft">
                 <Clock className="w-5 h-5 mx-auto mb-1 text-thinksid-navy" />
-                <span className="text-sm font-medium text-thinksid-navy block">{estimatedMinutes}-{estimatedMinutes + 10}</span>
+                <span className="text-sm font-medium text-thinksid-navy block">{estimatedMinutesMin}-{estimatedMinutesMax}</span>
                 <span className="text-xs text-slate-gray">minutes</span>
               </div>
               <div className="bg-white rounded-xl p-3 text-center shadow-soft">
@@ -113,8 +111,8 @@ export default async function WelcomePage({
             <ul className="space-y-2">
               {[
                 'Answer one question at a time',
-                'Use voice or type your responses',
-                'Your progress is saved automatically',
+                'Use your voice or type your answer, as you prefer',
+                'Your progress is saved each time you hit "Next"',
                 'Review and submit when done',
               ].map((step, index) => (
                 <li key={index} className="flex items-start gap-3 text-sm text-thinksid-navy/80">
