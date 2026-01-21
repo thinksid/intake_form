@@ -25,5 +25,18 @@ export default async function ResponsesPage({
     notFound()
   }
 
-  return <ResponseViewer questionnaire={questionnaire} />
+  // Serialize dates for client component
+  const serializedQuestionnaire = {
+    ...questionnaire,
+    responses: questionnaire.responses.map(r => ({
+      ...r,
+      created_at: r.created_at?.toISOString() || null,
+      updated_at: r.updated_at?.toISOString() || null,
+    })),
+    created_at: questionnaire.created_at?.toISOString() || null,
+    updated_at: questionnaire.updated_at?.toISOString() || null,
+    completed_at: questionnaire.completed_at?.toISOString() || null,
+  }
+
+  return <ResponseViewer questionnaire={serializedQuestionnaire} />
 }
