@@ -178,7 +178,7 @@ export default function QuestionView({
             <span className="font-medium text-white">
               Question {questionNumber}
             </span>
-            <span className="text-white font-medium">
+            <span className="font-bold" style={{ color: '#1c1c60' }}>
               {Math.round(progress)}% complete
             </span>
           </div>
